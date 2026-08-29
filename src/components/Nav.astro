@@ -1,0 +1,11 @@
+---
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path.startsWith(href);
+---
+
+<nav>
+  <a href="/">home</a>
+  <a href="/career" class={isActive("/career") ? "active" : ""}>career</a>
+  <a href="/projects" class={isActive("/projects") ? "active" : ""}>projects</a>
+</nav>

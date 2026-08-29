@@ -1,0 +1,28 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+    entry: CollectionEntry<'career'>;
+}
+
+const { entry } = Astro.props;
+const { role, company, startDate, endDate, highlights = [], techStack = [] } = entry.data;
+---
+
+<article>
+    <div>{startDate} → {endDate}</div>
+    <h3>{role}</h3>
+    <div>{company}</div>
+    <ul>
+        {highlights.map((highlight) => (
+            <li>{highlight}</li>
+        ))}
+    </ul>
+    {techStack.length > 0 && (
+        <div>
+            {techStack.map((tech) => (
+                <span>{tech}</span>
+            ))}
+        </div>
+    )}
+</article>

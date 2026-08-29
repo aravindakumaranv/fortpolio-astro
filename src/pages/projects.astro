@@ -1,0 +1,43 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Project">
+    <h1>Live Demo</h1>
+
+    <textarea id="demo-input">{`{"hello": "world"}`}</textarea>
+    <button id="demo-button">Run Check →</button>
+    <pre id="demo-output"></pre>
+</Layout>
+
+<script>
+    const DEMO_ENDPOINT = "https://8oh8dwy5dg.execute-api.eu-north-1.amazonaws.com/default/data-quality-demo";
+
+    const runButton = document.getElementById("demo-button");
+    const inputField = document.getElementById("demo-input") as HTMLTextAreaElement;
+    const outputField = document.getElementById("demo-output");
+
+    runButton?.addEventListener("click", async () => {
+        outputField!.textContent = "Running...";
+        let payload;
+        try {
+            payload = JSON.parse(inputField.value);
+        } catch (error) {
+            outputField!.textContent = "Invalid JSON input.";
+            return;
+        }
+
+        try {
+            const res = await fetch(DEMO_ENDPOINT, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            const json = await res.json();
+            outputField!.textContent = JSON.stringify(json, null, 2);
+        } catch (error: unknown) {
+            outputField!.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
+        }
+    });
+
+</script>

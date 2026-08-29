@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LogEntry from "../components/LogEntry.astro";
+import { getCollection } from "astro:content";
+
+const career = (await getCollection("career")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Layout title="Career">
+    {career.map((entry) => (
+        <LogEntry entry={entry} />
+    ))}
+</Layout>
