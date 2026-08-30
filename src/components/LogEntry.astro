@@ -3,26 +3,74 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
     entry: CollectionEntry<'career'>;
+    Content: any;
 }
 
-const { entry } = Astro.props;
+const { entry, Content } = Astro.props;
 const { role, company, startDate, endDate, highlights = [], techStack = [] } = entry.data;
+const isCurrent = endDate.toLowerCase() === "present";
 ---
 
-<article>
-    <div>{startDate} → {endDate}</div>
-    <h3>{role}</h3>
-    <div>{company}</div>
-    <ul>
-        {highlights.map((highlight) => (
-            <li>{highlight}</li>
-        ))}
-    </ul>
-    {techStack.length > 0 && (
-        <div>
-            {techStack.map((tech) => (
-                <span>{tech}</span>
-            ))}
-        </div>
+<details class="entry" id={entry.id}>
+  <summary class="entry-summary">
+    <span class={`dot ${isCurrent ? "is-current" : ""}`}></span>
+    <div class="entry-date">{startDate} → {endDate}</div>
+    <div class="entry-heading">
+      <h3 class="entry-role">{role}</h3>
+      <div class="entry-company">{company}</div>
+    </div>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </summary>
+
+  <div class="entry-detail">
+    {highlights.length > 0 && (
+      <ul>
+        {highlights.map((h) => <li>{h}</li>)}
+      </ul>
     )}
-</article>
+    {techStack.length > 0 && (
+      <div class="tags">
+        {techStack.map((t) => <span class="tag">{t}</span>)}
+      </div>
+    )}
+    <div class="entry-body">
+      <Content />
+    </div>
+  </div>
+</details>
+
+<style>
+  .entry { position: relative; margin-bottom: 1.25rem; }
+  .dot {
+    position: absolute; left: -1.9rem; top: 1.6rem;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--ink-soft); border: 3px solid var(--bg);
+  }
+  .dot.is-current { background: var(--accent); }
+
+  .entry-summary {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: baseline; gap: 1.25rem;
+    padding: 1.25rem 1.5rem; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 12px;
+  }
+  .entry-summary::-webkit-details-marker { display: none; }
+  .entry-summary::marker { content: ""; }
+
+  .entry-date { font-size: 0.85rem; color: var(--ink-soft); white-space: nowrap; flex-shrink: 0; }
+  .entry-heading { flex: 1; min-width: 0; }
+  .entry-role { font-family: var(--font-display); font-weight: 500; font-size: 1.1rem; margin: 0; }
+  .entry-company { color: var(--ink-soft); font-size: 0.9rem; }
+
+  .chevron { width: 18px; height: 18px; color: var(--ink-soft); flex-shrink: 0; transition: transform 0.2s ease; }
+  .entry[open] .chevron { transform: rotate(180deg); }
+
+  .entry-detail { padding: 1.25rem 1.5rem 0; }
+  .entry-detail ul { margin: 0 0 1rem; padding-left: 1.1rem; }
+  .entry-detail li { color: var(--ink-soft); margin-bottom: 0.4rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+  .tag { font-size: 0.78rem; font-weight: 600; background: var(--bg); border: 1px solid var(--border); color: var(--ink-soft); border-radius: 999px; padding: 0.25rem 0.7rem; }
+  .entry-body :global(a) { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+</style>

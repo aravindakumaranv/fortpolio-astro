@@ -1,13 +1,90 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import LogEntry from "../components/LogEntry.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
 const career = (await getCollection("career")).sort((a, b) => a.data.order - b.data.order);
+const rendered = await Promise.all(career.map((entry) => render(entry)));
 ---
 
 <Layout title="Career">
-    {career.map((entry) => (
-        <LogEntry entry={entry} />
-    ))}
+    <section class="timeline">
+        {career.map((entry, i) => (
+            <LogEntry entry={entry} Content={rendered[i].Content} />
+        ))}
+    </section>
 </Layout>
+
+<style>
+  .timeline {
+    position: relative;
+    max-width: min(90vw, 900px);
+    margin: 0 auto;
+    padding: 4rem 1.25rem 4rem 3rem;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 1.75rem;
+    top: 4rem;
+    bottom: 4rem;
+    width: 2px;
+    background: var(--border);
+  }
+</style>
+
+<script>
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced) {
+        document.querySelectorAll<HTMLDetailsElement>(".entry").forEach((details) => {
+            const summary = details.querySelector(".entry-summary") as HTMLElement;
+            const content = details.querySelector(".entry-detail") as HTMLElement;
+            let animation: Animation | null = null;
+            let isClosing = false;
+            let isExpanding = false;
+
+            summary.addEventListener("click", (e) => {
+                e.preventDefault();
+                details.style.overflow = "hidden";
+                if (isClosing || !details.open) {
+                    open();
+                } else if (isExpanding || details.open) {
+                    close();
+                }
+            });
+
+            function open() {
+                details.style.height = `${details.offsetHeight}px`;
+                details.open = true;
+                requestAnimationFrame(expand);
+            }
+
+            function expand() {
+                isExpanding = true;
+                const startHeight = `${details.offsetHeight}px`;
+                const endHeight = `${summary.offsetHeight + content.offsetHeight}px`;
+                animation?.cancel();
+                animation = details.animate({ height: [startHeight, endHeight]}, {duration: 250, easing: "ease-out"});
+                animation.onfinish = () => finish(true);
+            }
+
+            function close() {
+                isClosing = true;
+                const startHeight = `${details.offsetHeight}px`;
+                const endHeight = `${summary.offsetHeight}px`;
+                animation?.cancel();
+                animation = details.animate({ height: [startHeight, endHeight]}, {duration: 250, easing: "ease-out"});
+                animation.onfinish = () => finish(false);
+            }
+
+            function finish(open: boolean) {
+                details.open = open;
+                animation = null;
+                isClosing = false;
+                isExpanding = false;
+                details.style.height = "";
+                details.style.overflow = "";
+            }
+        });
+    }
+</script>
