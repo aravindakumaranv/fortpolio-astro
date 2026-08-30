@@ -1,0 +1,98 @@
+---
+---
+<div id="now-playing-wrap" class="now-playing-wrap" hidden>
+    <div id="now-playing" class="now-playing">
+        <button id="now-playing-toggle" class="np-toggle" type="button" aria-expanded="false" aria-label="Show what I'm listening to">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 14v-2a9 9 0 0 1 18 0v2" />
+                <rect x="1" y="14" width="6" height="7" rx="2" />
+                <rect x="17" y="14" width="6" height="7" rx="2" />
+            </svg>
+        </button>
+        <img id="now-playing-art" class="np-art" alt="" />
+        <a id="now-playing-track" class="np-track" href="#" target="_blank" rel="noopener"></a>
+    </div>
+    <span class="np-tooltip">Here's what I am listening to</span>
+</div>
+
+<style>
+  .now-playing-wrap {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 40;
+  }
+  .now-playing {
+    display: flex; align-items: center;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 999px;
+    overflow: hidden; max-width: 52px; height: 52px;
+    transition: max-width 0.3s ease, background 0.3s ease;
+  }
+  .np-art {
+    width: 32px; height: 32px; border-radius: 6px; object-fit: cover; flex-shrink: 0;
+    margin-left: 0.6rem; opacity: 0; transition: opacity 0.2s ease 0.1s;
+  }
+  .now-playing-wrap.is-open .np-art { opacity: 1; }
+  .now-playing-wrap.is-open .now-playing {
+    max-width: 340px;
+    background: color-mix(in srgb, var(--bg), var(--ink) 8%);
+  }
+  .np-toggle {
+    flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%;
+    background: none; border: none; color: var(--ink); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+  }
+  .np-toggle svg { width: 22px; height: 22px; }
+  .np-tooltip {
+    position: absolute; top: 50%; right: 60px; transform: translateY(-50%);
+    background: var(--ink); color: var(--bg); font-size: 0.8rem; font-weight: 600;
+    padding: 0.4rem 0.75rem; border-radius: 8px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+  }
+  .now-playing-wrap:hover .np-tooltip { opacity: 1; }
+  .now-playing-wrap.is-open .np-tooltip { display: none; }
+  .np-track {
+    padding-right: 1.1rem; margin-left: 0.6rem; color: var(--ink-soft); text-decoration: none;
+    font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    opacity: 0; transition: opacity 0.2s ease 0.1s;
+  }
+  .now-playing-wrap.is-open .np-track { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .now-playing, .np-tooltip, .np-track { transition: none; }
+  }
+</style>
+
+<script>
+    const ENDPOINT = "https://8oh8dwy5dg.execute-api.eu-north-1.amazonaws.com/default/spotify-now-playing";
+    const wrap = document.getElementById("now-playing-wrap")!;
+    const toggle = document.getElementById("now-playing-toggle")!;
+    const trackLink = document.getElementById("now-playing-track") as HTMLAnchorElement;
+    const artImg = document.getElementById("now-playing-art") as HTMLImageElement;
+
+    toggle.addEventListener("click", () => {
+        const isOpen = wrap.classList.toggle("is-open");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    async function update() {
+        try {
+        const res = await fetch(ENDPOINT);
+        const json = await res.json();
+        if (!json.ok || !json.data.isPlaying) {
+            wrap.hidden = true;
+            return;
+        }
+        trackLink.textContent = `${json.data.track} — ${json.data.artist}`;
+        trackLink.href = json.data.songUrl || "#";
+        if (json.data.albumArt) {
+            artImg.src = json.data.albumArt;
+            artImg.hidden = false;
+        } else {
+            artImg.hidden = true;
+        }
+        wrap.hidden = false;
+        } catch {
+        wrap.hidden = true;
+        }
+    }
+
+    update();
+    setInterval(update, 30000);
+</script>

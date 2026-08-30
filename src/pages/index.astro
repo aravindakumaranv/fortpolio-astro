@@ -51,7 +51,8 @@ import Layout from "../layouts/Layout.astro";
     .scroll-cue .dot { animation: scrolldot 1.8s ease-in-out infinite; }
   }
   @keyframes scrolldot { 0% { transform: translateY(0); opacity: 1; } 75% { opacity: 0.2; } 100% { transform: translateY(28px); opacity: 0; } }
-  .paths { display: flex; flex-direction: column; gap: 1.5rem; max-width: 720px; margin: 0 auto; padding: 0 1.25rem 4rem; }  .path-item { text-decoration: none; color: inherit; }
+  .paths { display: flex; flex-direction: column; gap: 1.5rem; max-width: min(90vw, 1100px); margin: 0 auto; padding: 0 1.25rem 4rem; }
+  .path-item { text-decoration: none; color: inherit; }
   .path-name { font-family: var(--font-display); color: var(--ink); font-weight: 500; font-size: 1.2rem; }
   .path-item:hover .path-name { color: var(--accent); }
   .path-desc { color: var(--ink-soft); font-size: 0.95rem; margin: 0.25rem 0 0; }

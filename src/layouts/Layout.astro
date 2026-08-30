@@ -1,7 +1,7 @@
 ---
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
-
+import NowPlaying from "../components/NowPlaying.astro";
 interface Props {
   title: string;
   description?: string;
@@ -31,5 +31,6 @@ const { title, description = "My personal portfolio site." } = Astro.props;
   <body>
     <Nav />
     <slot />
+    <NowPlaying/>
   </body>
 </html>
