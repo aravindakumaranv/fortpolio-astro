@@ -2,6 +2,77 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="My Portfolio">
-  <h1>Hello, this is my portfolio!</h1>
+<Layout title="Aravind">
+  <section class="hero">
+    <h1>Hi, I'm Aravind!</h1>
+    <p class="lede" id="lede">
+      Welcome to my tiny corner of the internet. Come on in, have a look around. I like <span class="rotator" id="rotator">coding</span>.
+    </p>
+    <div class="scroll-cue"><span class="line"><span class="dot"></span></span>Scroll</div>
+  </section>
+
+  <section class="paths">
+    <a class="path-item" href="/career">
+      <div class="path-name">Career</div>
+      <p class="path-desc">Where I've worked and what I actually built there.</p>
+    </a>
+    <a class="path-item" href="/projects">
+      <div class="path-name">Projects</div>
+      <p class="path-desc">A few things I've made.</p>
+    </a>
+    <a class="path-item" href="/life">
+      <div class="path-name">Life</div>
+      <p class="path-desc">What I get up to outside of work.</p>
+    </a>
+  </section>
 </Layout>
+
+<style>
+  .hero {
+    min-height: 100vh;
+    min-height: calc(100dvh - 74px);
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; padding: 0 1.25rem 4rem; max-width: min(90vw, 1100px); margin: 0 auto;
+  }
+  h1 {
+    font-family: var(--font-display); font-weight: 500; font-size: clamp(2.6rem, 7vw, 4.6rem);
+    line-height: 1.1; margin: 0 0 1.5rem; letter-spacing: -0.01em; text-wrap: balance;
+  }
+  .lede { color: var(--ink-soft); font-size: 1.1rem; max-width: 52ch; margin: 0; }
+  .rotator { display: inline-block; color: var(--accent); font-weight: 700; transition: opacity 0.28s ease, transform 0.28s ease; }
+  .rotator.swap { opacity: 0; transform: translateY(4px); }
+  .scroll-cue {
+    position: absolute; bottom: 12px; left: 1.25rem; display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+    color: var(--ink-soft); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
+  }
+  .scroll-cue .line { width: 1px; height: 32px; background: var(--border); position: relative; overflow: hidden; }
+  .scroll-cue .dot { position: absolute; top: 0; left: -2px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-cue .dot { animation: scrolldot 1.8s ease-in-out infinite; }
+  }
+  @keyframes scrolldot { 0% { transform: translateY(0); opacity: 1; } 75% { opacity: 0.2; } 100% { transform: translateY(28px); opacity: 0; } }
+  .paths { display: flex; flex-direction: column; gap: 1.5rem; max-width: 720px; margin: 0 auto; padding: 0 1.25rem 4rem; }  .path-item { text-decoration: none; color: inherit; }
+  .path-name { font-family: var(--font-display); color: var(--ink); font-weight: 500; font-size: 1.2rem; }
+  .path-item:hover .path-name { color: var(--accent); }
+  .path-desc { color: var(--ink-soft); font-size: 0.95rem; margin: 0.25rem 0 0; }
+</style>
+
+<script>
+  const interests = ["coding", "tinkering", "bouldering", "running", "reading", "crochet", "embroidery"];
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const rotator = document.getElementById("rotator")!;
+  if (reduced) {
+    const lede = document.getElementById("lede")!;
+    lede.textContent = "Welcome to my tiny corner of the internet. Come on in, have a look around. I like " + interests.slice(0, -1).join(", ") + ", and " + interests[interests.length - 1] + ".";
+  } else {
+    let i = 0;
+    setInterval(() => {
+      rotator?.classList.add("swap");
+      setTimeout(() => {
+        i = (i + 1) % interests.length;
+        rotator.textContent = interests[i];
+        rotator.classList.remove("swap");
+      }, 280);
+    }, 2200);
+  }
+</script>
