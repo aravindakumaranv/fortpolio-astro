@@ -38,3 +38,7 @@ body {
 * {
   box-sizing: border-box;
 }
+
+body:has(#now-playing-wrap[hidden]) #now-reading-wrap {
+  bottom: 1.5rem;
+}
