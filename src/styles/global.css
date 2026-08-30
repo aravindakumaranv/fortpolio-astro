@@ -12,6 +12,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: light dark;
     --bg: #000022;
     --ink: #FBF5F3;
     --ink-soft: #9B948F;
